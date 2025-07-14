@@ -1,0 +1,59 @@
+/* ========== UTILITIES ========== */
+const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => document.querySelectorAll(sel);
+
+/* ========== FOOTER YEAR ========== */
+$("#year").textContent = new Date().getFullYear();
+
+/* ========== LAZY-LEVEL QUIZ ========== */
+const plans = [
+  "Plan A: During every TV ad break, do 20 seconds of marching in place. No ads? Set a 30-min timer.",
+  "Plan B: Replace ONE sugary drink a day with water + lemon. Burn 100 extra calories by strolling 10 minutes after lunch.",
+  "Plan C: Take the stairs down instead of the elevator once per day. Swap chips for popcorn at night."
+];
+
+$("#quiz").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const idx = $("#lazyLevel").value;
+  if (idx === "") return;
+  $("#plan").classList.remove("d-none");
+  $("#plan").innerHTML = `<div class="alert alert-info">${plans[idx]}</div>`;
+});
+
+/* ========== DAILY TIP ========== */
+const tips = [
+  "Drink a glass of water before every meal—you’ll naturally eat less.",
+  "Brush your teeth after dinner to discourage late-night snacking.",
+  "Stand while scrolling social media for 5 minutes—tiny wins add up!",
+  "Put fruit in visible sight; hide cookies on the top shelf.",
+  "Set phone alarms that say “Get up & stretch!” twice a day."
+];
+$("#dailyTip").textContent = tips[Math.floor(Math.random() * tips.length)];
+
+/* ========== PROGRESS TRACKER (Local Storage) ========== */
+const STORAGE_KEY = "lazyfit-log";
+
+function loadLog() {
+  const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+  const table = $("#log");
+  table.innerHTML = data.length
+    ? `<thead><tr><th>Date</th><th>Weight (kg)</th></tr></thead>
+       <tbody>${data
+         .map((row) => `<tr><td>${row.date}</td><td>${row.weight}</td></tr>`)
+         .join("")}</tbody>`
+    : "<tr><td>No entries yet.</td></tr>";
+}
+loadLog();
+
+$("#tracker").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const date = $("#date").value;
+  const weight = $("#weight").value;
+  if (!date || !weight) return;
+
+  const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+  data.push({ date, weight });
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  loadLog();
+  e.target.reset();
+});
